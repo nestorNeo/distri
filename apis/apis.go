@@ -50,10 +50,15 @@ func GetRouterApp(msg string, vecinos map[string]nodos.Nodo) *gin.Engine {
 					return
 				}
 
-				resp, _ := http.Post("http://"+vodka.Addr+"/buzon",
+				resp, err := http.Post("http://"+vodka.Addr+"/buzon",
 					"application/json",
 					bytes.NewBuffer(jsonData),
 				)
+
+				if err != nil {
+					log.Println("HEY TEQUILA", err)
+				}
+
 				if resp != nil {
 					LeerRespuesta(resp)
 				}
