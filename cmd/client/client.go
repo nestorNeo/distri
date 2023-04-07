@@ -12,7 +12,7 @@ import (
 func main() {
 
 	for i := 0; i < 100; i++ {
-		resp, err := http.Get("http://localhost:5000/ping")
+		resp, err := http.Get("http://localhost:9001/ping")
 		if err != nil {
 			log.Println(err)
 			log.Println("stopping")
