@@ -6,13 +6,15 @@ import (
 )
 
 func main() {
-	vecinos := []nodos.Nodo{
-		{
-			Addr: "localhost:9002",
+	// 192.168.100.95 - tequila
+	// 192.168.100.33 - vodka
+	vecinos := map[string]nodos.Nodo{
+		"tequila": {
+			Addr: "192.168.100.95:9002",
 			Name: "tequila",
 		},
-		{
-			Addr: "localhost:9003",
+		"vodka": {
+			Addr: "192.168.100.33:9003",
 			Name: "vodka",
 		},
 	}

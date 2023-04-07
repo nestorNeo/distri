@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"log"
@@ -10,9 +11,10 @@ import (
 	"github.com/nestorneo/distri/middleware"
 	"github.com/nestorneo/distri/nodos"
 	"github.com/nestorneo/distri/respuestas"
+	"github.com/nestorneo/distri/solicitudes"
 )
 
-func GetRouterApp(msg string, vecinos []nodos.Nodo) *gin.Engine {
+func GetRouterApp(msg string, vecinos map[string]nodos.Nodo) *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.GuidMiddleware())
 
@@ -21,13 +23,67 @@ func GetRouterApp(msg string, vecinos []nodos.Nodo) *gin.Engine {
 			"message": msg,
 		})
 		go func() {
-			for _, vecino := range vecinos {
-				resp, _ := http.Get("http://" + vecino.Addr + "/ping")
+
+			if vecinos == nil {
+				return
+			}
+
+			if vodka, ok := vecinos["vodka"]; ok {
+				resp, _ := http.Get("http://" + vodka.Addr + "/ping")
+				if resp != nil {
+					LeerRespuesta(resp)
+				}
+			}
+			if vodka, ok := vecinos["tequila"]; ok {
+
+				ordenTequila := solicitudes.BuzonTequila{
+					Margarita:     true,
+					EnLasRocas:    false,
+					Instrucciones: "para chela xD please",
+				}
+
+				jsonData, err := json.Marshal(ordenTequila)
+
+				if err != nil {
+					log.Println(err)
+					log.Println("error mandandole info a tequila")
+					return
+				}
+
+				resp, _ := http.Post("http://"+vodka.Addr+"/buzon",
+					"application/json",
+					bytes.NewBuffer(jsonData),
+				)
 				if resp != nil {
 					LeerRespuesta(resp)
 				}
 			}
 		}()
+	})
+
+	return r
+}
+
+func GetRouterTequila(msg string, vecinos map[string]nodos.Nodo) *gin.Engine {
+	r := gin.Default()
+	r.Use(middleware.GuidMiddleware())
+
+	r.POST("/buzon", func(c *gin.Context) {
+		log.Println("con el tequila")
+
+		var ordenDeTequila solicitudes.BuzonTequila
+
+		if err := c.BindJSON(&ordenDeTequila); err != nil {
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": msg,
+			"info":    "recibido",
+		})
+
+		log.Println(ordenDeTequila)
+
 	})
 
 	return r

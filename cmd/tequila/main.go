@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	r := apis.GetRouterApp("tequila", nil)
+	r := apis.GetRouterTequila("tequila", nil)
 	r.Run("0.0.0.0:9002")
 }
